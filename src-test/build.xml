@@ -1,0 +1,46 @@
+<project name="test" default="test">
+
+    <!-- basedir is where this file is located, so it can be imported -->
+    <dirname property="test.basedir" file="${ant.file.test}"/>
+	
+	<pathconvert property="rhino.jar">
+	    <path location="${test.basedir}/lib/js.jar" />
+	</pathconvert>
+	<pathconvert property="report.dir">
+	    <path location="${test.basedir}/report" />
+	</pathconvert>
+    <pathconvert property="test.runner.js">
+        <path location="${test.basedir}/test-runner.js" />
+    </pathconvert>
+    <pathconvert property="test.runner.html">
+        <path location="${test.basedir}/test-runner.html" />
+    </pathconvert>
+    
+    <target name="init" description="Initialise">
+	    <mkdir dir="${report.dir}" />
+    </target>
+
+	<target name="test" depends="init, qunit" description="Run all tests" />
+	
+	<target name="qunit" depends="init" description="Run the QUnit tests">
+		<echo>### Running QUnit</echo>
+		<echo> * Test runner: ${test.runner.html}</echo>
+		<echo> * Report dir: ${report.dir}</echo>
+		<java classpath="${rhino.jar}"
+			  classname="org.mozilla.javascript.tools.shell.Main"
+			  failonerror="true"
+			  fork="true"
+			  dir="${test.basedir}">
+			<arg value="-opt" />
+            <arg value="-1" />
+            <arg value="${test.runner.js}" />
+            <arg value="${test.runner.html}" />
+            <arg value="${report.dir}" />
+		</java>
+	</target>
+	
+    <target name="clean" description="Clean up after build">
+        <delete dir="${report.dir}" />
+    </target>
+	
+</project>
