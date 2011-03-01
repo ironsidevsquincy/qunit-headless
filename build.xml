@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="JS JUnit Logger" basedir="." default="package">
+<project name="JS JUnit Logger" basedir="." default="integration-test">
 
 	<!-- Created by Darren Hurley on 2011-03-01. -->
 	<!-- Copyright (c) 2011 BBC. All rights reserved. -->
-	<import file="./src-test/build.xml" />
+	<import file="./integration-test/build.xml" />
 	
 	<!-- YUI Compressor task definition -->
 	<taskdef name="yui-compressor"
@@ -16,18 +16,18 @@
 	<target name="init" description="Initialise">
 	    <mkdir dir="./dist"/>
 	</target>
-
-    <target name="test" depends="init" description="Run tests">
-        <antcall target="test.qunit" />
-    </target>
     
-    <target name="package" depends="test" description="Package up the js">
+    <target name="package" depends="init" description="Package up the js">
         <concat destfile="./dist/junit-logger.js" fixlastline="true">
             <fileset dir="./src" includes="**/*.js" />
         </concat>
     	<yui-compressor munge="true" warn="true" fromdir="./dist" todir="./dist">
     		<include name="junit-logger.js" />
     	</yui-compressor>
+    </target>
+
+    <target name="integration-test" depends="package" description="Run tests">
+        <antcall target="integration-test.integration-test" />
     </target>
 
 </project>

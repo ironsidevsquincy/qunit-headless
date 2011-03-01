@@ -1,12 +1,8 @@
 // use EnvJS to load js in test runner
-load('./lib/env.rhino.1.2.js');
+load('../lib/env.rhino.1.2.js');
 
 // use our junit logging
-load('../src/uk.js');
-load('../src/uk/co.js');
-load('../src/uk/co/darrenhurley.js');
-load('../src/uk/co/darrenhurley/logger.js');
-load('../src/uk/co/darrenhurley/logger/JUnit.js');
+load('../dist/junit-logger-min.js');
 
 // write to a file
 var fstream = new java.io.FileWriter(arguments[1] + '/TEST-junit.xml');

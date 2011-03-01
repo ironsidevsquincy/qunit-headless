@@ -1,10 +1,10 @@
-<project name="test" default="test">
+<project name="integration-test" default="integration-test">
 
     <!-- basedir is where this file is located, so it can be imported -->
-    <dirname property="test.basedir" file="${ant.file.test}"/>
+    <dirname property="test.basedir" file="${ant.file.integration-test}"/>
 	
 	<pathconvert property="rhino.jar">
-	    <path location="${test.basedir}/lib/js.jar" />
+	    <path location="${test.basedir}/../lib/js.jar" />
 	</pathconvert>
 	<pathconvert property="report.dir">
 	    <path location="${test.basedir}/report" />
@@ -13,16 +13,16 @@
         <path location="${test.basedir}/test-runner.js" />
     </pathconvert>
     <pathconvert property="test.runner.html">
-        <path location="${test.basedir}/test-runner.html" />
+        <path location="${test.basedir}/../src-test/test-runner.html" />
     </pathconvert>
     
-    <target name="init" description="Initialise">
+    <target name="integration-test.init" description="Initialise">
 	    <mkdir dir="${report.dir}" />
     </target>
 
-	<target name="test" depends="init, qunit" description="Run all tests" />
+	<target name="integration-test" depends="integration-test.init, qunit" description="Run all tests" />
 	
-	<target name="qunit" depends="init" description="Run the QUnit tests">
+	<target name="qunit" depends="integration-test.init" description="Run the QUnit tests">
 		<echo>### Running QUnit</echo>
 		<echo> * Test runner: ${test.runner.html}</echo>
 		<echo> * Report dir: ${report.dir}</echo>
@@ -39,7 +39,7 @@
 		</java>
 	</target>
 	
-    <target name="clean" description="Clean up after build">
+    <target name="integration-test.clean" description="Clean up after build">
         <delete dir="${report.dir}" />
     </target>
 	
