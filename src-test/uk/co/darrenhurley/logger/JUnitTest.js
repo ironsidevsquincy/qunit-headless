@@ -16,110 +16,223 @@ test('Should be able to set line writer', function(){
 	strictEqual(lineWriter, jUnit.lineWriter, 'Line writer should be supplied value');
 });
 
-module('JUnit.addSuite');
+module('JUnit.startTestSuite');
 
-var suiteNames = ['foo'];
+var suites = [
+    {
+        name: 'suiteOne',
+        failed: 0,
+        passed: 1,
+        total: 1
+    }
+];
 
-for(var i in suiteNames){
-	
-	test('Should be able to add a suite [#' + i + ']', function(){
+for(var i in suites){
+	test('Should be able to start a test suite [#' + i + ']', function(){
 		var jUnit = new uk.co.darrenhurley.logger.JUnit();
-		var suiteName = suiteNames[i];
-		jUnit.addSuite(suiteName);
-		strictEqual(suiteName, jUnit.currentSuite, 'Should have set current suite to \'' + suiteName + '\'');
-		deepEqual({}, jUnit.suites[suiteName], 'Should have stored an empty object against the suite name');
+		var suite = suites[i];
+		jUnit.startTestSuite(suite);
+		var expectedSuite = {
+		    name: suite.name,
+		    tests: []
+		};
+		deepEqual(expectedSuite, jUnit.suites[0], 'Has not started suite correctly');
 	});
-	
 }
 
-test('Should throw error if no name given', function(){
+test('Should throw error if no suite given', function(){
 	var jUnit = new uk.co.darrenhurley.logger.JUnit();
 	raises(function(){
-		jUnit.addSuite();
+		jUnit.startTestSuite();
 	}, 'Should have thrown an error when no suite name was supplied');
 });
 
-module('JUnit.addTest');
+module('JUnit.endTestSuite');
 
-var tests = [
-	['bar_one', true, ''],
-	['bar_two', false, 'A message'],
-];
-
-for(var j in tests){
-
-	test('Should be able to add a test [#' + j + ']', function(){
+for(var j in suites){
+	test('Should be able to end a test suite [#' + j + ']', function(){
 		var jUnit = new uk.co.darrenhurley.logger.JUnit();
-		// take the first suite name
-		var suiteName = suiteNames[0];
-		jUnit.addSuite(suiteName);
-		jUnit.addTest(tests[j][0], tests[j][1], tests[j][2])
-		strictEqual(tests[j][1], jUnit.suites[suiteName][tests[j][0]].result);
-		strictEqual(tests[j][2], jUnit.suites[suiteName][tests[j][0]].message);
+		var suite = suites[j];
+		jUnit.startTestSuite(suite);
+		jUnit.endTestSuite(suite);
+		var expectedSuite = suite;
+		suite.tests = [];
+		deepEqual(expectedSuite, jUnit.suites[0], 'Has not ended suite correctly');
 	});
-
 }
 
-test('Should throw error if no name given', function(){
+test('Should throw error if no suite given', function(){
 	var jUnit = new uk.co.darrenhurley.logger.JUnit();
-	// take the first suite name
-	var suiteName = suiteNames[0];
-	jUnit.addSuite(suiteName);
+	// use first suite
+	jUnit.startTestSuite(suites[0]);
 	raises(function(){
-		jUnit.addTest();
-	}, 'Should have thrown an error when no test name was supplied');
+		jUnit.endTestSuite();
+	}, 'Should have thrown an error when no suite name was supplied');
 });
+
+module('JUnit.startTest');
+
+var tests = [
+    {
+        name: 'testOne'
+    }
+];
+
+for(var k in tests){
+    test('Should be able to start a test [#' + k + ']', function(){
+        var jUnit = new uk.co.darrenhurley.logger.JUnit();
+        // take the first suite name
+        jUnit.startTestSuite(suites[0]);
+        var test = tests[k];
+        jUnit.startTest(test)
+        var expectedTest = {
+            name: test.name,
+            assertions: []
+        };
+        deepEqual(expectedTest, jUnit.suites[0].tests[0], 'Test not started correctly');
+    });
+}
+
+test('Should throw error if no test given', function(){
+    var jUnit = new uk.co.darrenhurley.logger.JUnit();
+    // take the first suite name
+    jUnit.startTestSuite(suites[0]);
+    raises(function(){
+        jUnit.addTest();
+    }, 'Should have thrown an error when no test supplied');
+});
+
+module('JUnit.endTest');
+
+for(var l in tests){
+    test('Should be able to end a test [#' + l + ']', function(){
+        var jUnit = new uk.co.darrenhurley.logger.JUnit();
+        // take the first suite name
+        jUnit.startTestSuite(suites[0]);
+        var test = tests[l];
+        jUnit.startTest(test);
+        jUnit.endTest(test);
+        var expectedTest = test;
+        expectedTest.assertions = [];
+        deepEqual(expectedTest, jUnit.suites[0].tests[0], 'Test not ended correctly');
+    });
+}
+
+test('Should throw error if no test given', function(){
+    var jUnit = new uk.co.darrenhurley.logger.JUnit();
+    // take the first suite name
+    jUnit.startTestSuite(suites[0]);
+    jUnit.startTest(tests[0]);
+    raises(function(){
+        jUnit.endTest();
+    }, 'Should have thrown an error when no test supplied');
+});
+
+module('JUnit.addAssertions');
+
+var assertions = [
+    {
+        result: false,
+        message: 'Failed'
+    }
+];
+
+for(var m in assertions){
+    test('Should be able to add an assertion [#' + m + ']', function(){
+        var jUnit = new uk.co.darrenhurley.logger.JUnit();
+        // take the first suite name
+        jUnit.startTestSuite(suites[0]);
+        // and first test
+        jUnit.startTest(tests[0]);
+        var assertion = assertions[m];
+        jUnit.addAssertion(assertions[m]);
+        deepEqual(assertion, jUnit.suites[0].tests[0].assertions[0], 'Assertion not add correctly');
+    });
+}
+
+test('Should throw error if no assertion given', function(){
+    var jUnit = new uk.co.darrenhurley.logger.JUnit();
+    // take the first suite name
+    jUnit.startTestSuite(suites[0]);
+    jUnit.startTest(tests[0]);
+    raises(function(){
+        jUnit.addAssertions();
+    }, 'Should have thrown an error when no assertion supplied');
+});
+
 
 module('JUnit.write');
 
-var suites = [
-	[
-		{
-		    'suite_one': [
-			    ['test_one', true],
-			    ['test_two', false, 'A message']
-		    ]
-	    },
-	    [
-            '<?xml version="1.0" encoding="UTF-8">',
-            '<testsuites>',
-	        '   <testsuite errors="0" failures="1" name="suite_one" tests="2">',
-    	    '       <testcase name="test_one" />',
-    	    '       <testcase name="test_two">',
-    	    '           <failure message="A message" type="failed" />',
-    	    '       </testcase>',
-    	    '   </testsuite>',
-    	    '</testsuites>'
-	    ]
-	]
+var outputs = [
+ [
+     [
+         {
+             name: 'suiteOne',
+             passed: 1,
+             failed: 1,
+             total: 2,
+             tests: [
+                {
+                    name: 'testOne',
+                    assertions: [
+                        {
+                            result: true
+                        }
+                    ]
+                },
+                {
+                    name: 'testTwo',
+                    assertions: [
+                        {
+                            result: false,
+                            message: 'Failed!!!'
+                        }
+                    ]
+                }
+             ]
+         }
+     ],
+     [
+         '<?xml version="1.0" encoding="UTF-8">',
+         '<testsuites>',
+         '    <testsuite errors="0" failures="1" name="suiteOne" tests="2">',
+         '        <testcase name="testOne">',
+         '        </testcase>',
+         '        <testcase name="testTwo">',
+         '            <failure message="Failed!!!" type="failed" />',
+         '        </testcase>',
+         '    </testsuite>',
+         '</testsuites>'
+     ]
+ ]
 ];
 
-for(var k in suites){
-
-	test('Should write xml correctly [#' + k + ']', function(){
-	    // how many assertions are we expecting
-	    var expectCount = 0
-	        i           = 0;
-	    while(suites[i]){
-	        expectCount += suites[i++][1].length;
-	    }
-	    expect(expectCount);
+for(var n in outputs){
+    test('Should write xml correctly [#' + n + ']', function(){
+        var config          = outputs[n][0],
+            xml             = outputs[n][1],
+            lineWriterCount = 0;
+        // how many assertions to we expect
+        expect(xml.length);
+        // use our own line writer
+        var jUnit = new uk.co.darrenhurley.logger.JUnit(function(line){
+            equal(line, xml[lineWriterCount++], 'Should output correct line');
+        });
         // add the suites and tests
-        for(var suiteName in suites[k][0]){
-    	    var lineWriterCount = 0;
-    	    // use our own line writer
-            var jUnit = new uk.co.darrenhurley.logger.JUnit(function(line){
-                equal(line, suites[k][1][lineWriterCount++], 'Should output correct line');
-            });
-            jUnit.addSuite(suiteName);
-            var suite = suites[k][0][suiteName];
-            for(var m in suite){
-                var test = suite[m];
-                jUnit.addTest(test[0], test[1], test[2])
+        for(var i in config){
+            var suite = config[i];
+            jUnit.startTestSuite(suite);
+            for(var j in suite.tests){
+                var test = suite.tests[j];
+                jUnit.startTest(test);
+                for(var k in test.assertions){
+                    jUnit.addAssertion(test.assertions[k]);
+                }
+                jUnit.endTest(test);
             }
-            // write out the log
-            jUnit.write();
-        }
-	});
-
+            jUnit.endTestSuite(suite);
+        }    
+        // write out the log
+        jUnit.write();
+    });
 }

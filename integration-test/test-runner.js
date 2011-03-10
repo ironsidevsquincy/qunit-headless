@@ -1,6 +1,5 @@
 // use EnvJS to load js in test runner
 load('../lib/env.rhino.1.2.js');
-
 // use our junit logging
 load('../dist/junit-logger-min.js');
 
@@ -17,7 +16,6 @@ var logger = new uk.co.darrenhurley.logger.JUnit(lineWriter);
 
 Envjs({
     scriptTypes: {
-        '': true, //anonymous and inline
         'text/javascript': true
     },
     afterScriptLoad:{
@@ -28,14 +26,20 @@ Envjs({
 	    	QUnit.config.updateRate = 0;
 	    	
 	    	// override logging
-	    	QUnit.moduleStart = function(obj){
-	    	    logger.addSuite(obj.name);
+	    	QUnit.moduleStart = function(module){
+	    	    logger.startTestSuite(module);
 	    	};
-	    	QUnit.log = function(obj){
-                // Envjs.log('{' + module + '}(' + testCount++ + ')[' + (obj.result ? 'PASS' : 'FAIL' ) + ']' + (obj.message ? ' ' + obj.message : ''));
+	    	QUnit.moduleDone = function(module){
+	    	    logger.endTestSuite(module);
 	    	};
-	    	QUnit.testDone = function(obj){
-	    	    logger.addTest(obj.name, !obj.failed);
+	    	QUnit.testStart = function(test){
+	    	    logger.startTest(test);
+	    	};
+	    	QUnit.testDone = function(test){
+	    	    logger.endTest(test);
+	    	};
+	    	QUnit.log = function(assertion){
+	    	    logger.addAssertion(assertion);
 	    	};
         }
     }

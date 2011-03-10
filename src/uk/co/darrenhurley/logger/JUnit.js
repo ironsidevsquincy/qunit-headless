@@ -2,28 +2,46 @@ uk.co.darrenhurley.logger.JUnit = function(lineWriter){
 	
 	// use print method to wite lines by default
 	this.lineWriter = lineWriter || print;
-	this.suites = {};
-	this.currentSuite = '';
+	this.suites = [];
 	this.tabSize = 4;
 	
 };
 
-uk.co.darrenhurley.logger.JUnit.prototype.addSuite = function(name){
-	
-	if(!name) throw 'No suite name supplied';
-	this.suites[name] = {};
-	this.currentSuite = name;
-	
+uk.co.darrenhurley.logger.JUnit.prototype.startTestSuite = function(suite){
+	if(!suite) throw 'No suite supplied';
+	this.suites.push({
+	    name: suite.name,
+	    tests: []
+	});
 };
 
-uk.co.darrenhurley.logger.JUnit.prototype.addTest = function(name, result, message){
+uk.co.darrenhurley.logger.JUnit.prototype.endTestSuite = function(suite){
+	if(!suite) throw 'No suite supplied';
+	// get current suite
+	var currentSuite = this.suites[this.suites.length - 1];
+	currentSuite.failed = suite.failed;
+	currentSuite.passed = suite.passed;
+	currentSuite.total  = suite.total;
+};
 
-	if(!name) throw 'No test name supplied';
-	this.suites[this.currentSuite][name] = {
-		result: result,
-		message: message
-	};
+uk.co.darrenhurley.logger.JUnit.prototype.startTest = function(test){
+	if(!test) throw 'No test supplied';
+	// get current suite
+    this.suites[this.suites.length - 1].tests.push({
+        name: test.name,
+        assertions: []
+    });
+};
 
+uk.co.darrenhurley.logger.JUnit.prototype.endTest = function(test){
+	if(!test) throw 'No test supplied';
+};
+
+uk.co.darrenhurley.logger.JUnit.prototype.addAssertion = function(assertion){
+	if(!assertion) throw 'No assertion supplied';
+	// get current test
+	var currentSuite = this.suites[this.suites.length - 1];
+	currentSuite.tests[currentSuite.tests.length - 1].assertions.push(assertion);
 };
 
 uk.co.darrenhurley.logger.JUnit.prototype.write = function(){
@@ -33,29 +51,22 @@ uk.co.darrenhurley.logger.JUnit.prototype.write = function(){
     this.lineWriter('<testsuites>');
     
     // print each testsuite
-    for(var suiteName in this.suites){
-        var suite         = this.suites[suiteName],
-            failuresCount = 0,
-            testsCount    = 0,
-            i             = 0;
-        for(testName in suite){
-            testsCount++
-            if(!suite[testName].result) failuresCount++;
-        }
-        this.lineWriter(new Array(this.tabSize).join(' ') + '<testsuite errors="0" failures="' + failuresCount + '" name="' + suiteName + '" tests="' + testsCount + '">');
+    for(var i in this.suites){
+        var suite         = this.suites[i];
+        this.lineWriter(new Array(this.tabSize + 1).join(' ') + '<testsuite errors="0" failures="' + suite.failed + '" name="' + suite.name + '" tests="' + suite.total + '">');
         // print the tests in the testsuite
-        for(testName in suite){
-            var test = suite[testName]
-            if(test.result){
-                this.lineWriter(new Array(2 * this.tabSize).join(' ') + '<testcase name="' + testName + '" />');
+        for(j in suite.tests){
+            var test = suite.tests[j];
+            this.lineWriter(new Array((2 * this.tabSize) + 1).join(' ') + '<testcase name="' + test.name + '">');
+            for(var j in test.assertions){
+                var assertion = test.assertions[i];
+                if(!assertion.result){
+                    this.lineWriter(new Array((3 * this.tabSize) + 1).join(' ') + '<failure message="' + assertion.message + '" type="failed" />');
+                }
             }
-            else{
-                this.lineWriter(new Array(2 * this.tabSize).join(' ') + '<testcase name="' + testName + '">');
-                this.lineWriter(new Array(3 * this.tabSize).join(' ') + '<failure message="' + test.message + '" type="failed" />');
-                this.lineWriter(new Array(2 * this.tabSize).join(' ') + '</testcase>');
-            }
+            this.lineWriter(new Array((2 * this.tabSize) + 1).join(' ') + '</testcase>');
         }
-        this.lineWriter(new Array(this.tabSize).join(' ') + '</testsuite>')
+        this.lineWriter(new Array(this.tabSize + 1).join(' ') + '</testsuite>')
     }
     
     this.lineWriter('</testsuites>');
