@@ -1,3 +1,9 @@
+// override getTime
+var time = 0
+uk.co.darrenhurley.logger.JUnit.getTime = function(){
+    return time += 1521;
+};
+
 module('JUnit');
 
 test('Should be able to instantiate', function(){
@@ -23,7 +29,7 @@ var suites = [
         name: 'suiteOne',
         failed: 0,
         passed: 1,
-        total: 1
+        time: 1.521
     }
 ];
 
@@ -74,7 +80,8 @@ module('JUnit.startTest');
 
 var tests = [
     {
-        name: 'testOne'
+        name: 'testOne',
+        time: 1.521
     }
 ];
 
@@ -170,7 +177,6 @@ var outputs = [
              name: 'suiteOne',
              passed: 1,
              failed: 1,
-             total: 2,
              tests: [
                 {
                     name: 'testOne',
@@ -186,7 +192,14 @@ var outputs = [
                         {
                             result: false,
                             message: 'Failed!!!'
-                        }
+                        },
+                        {
+                            result: false,
+                            message: 'Failed again!!!'
+                        },
+                        {
+                            result: true
+                        },
                     ]
                 }
              ]
@@ -195,11 +208,11 @@ var outputs = [
      [
          '<?xml version="1.0" encoding="UTF-8"?>',
          '<testsuites>',
-         '    <testsuite errors="0" failures="1" name="suiteOne" tests="2">',
-         '        <testcase name="testOne">',
-         '        </testcase>',
-         '        <testcase name="testTwo">',
+         '    <testsuite errors="0" failures="1" name="suiteOne" tests="2" time="7.605">',
+         '        <testcase name="testOne" assertions="1" time="1.521" />',
+         '        <testcase name="testTwo" assertions="3" time="1.521">',
          '            <failure message="Failed!!!" type="failed" />',
+         '            <failure message="Failed again!!!" type="failed" />',
          '        </testcase>',
          '    </testsuite>',
          '</testsuites>'

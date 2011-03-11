@@ -4,49 +4,65 @@ uk.co.darrenhurley.logger.JUnit = function(lineWriter){
 	this.lineWriter = lineWriter || print;
 	this.suites = [];
 	this.tabSize = 4;
+	this.currentTestSuite = undefined;
+	this.currentTestSuiteTime = undefined;
+	this.currentTest = undefined;
+	this.currentTestTime = undefined;
 	
+};
+
+uk.co.darrenhurley.logger.JUnit.getTime = function(){
+    return new Date().getTime();
 };
 
 uk.co.darrenhurley.logger.JUnit.prototype.startTestSuite = function(suite){
 	if(!suite) throw 'No suite supplied';
-	this.suites.push({
+	this.currentTestSuite = {
 	    name: suite.name,
 	    tests: []
-	});
+	};
+	this.suites.push(this.currentTestSuite);
+	this.currentTestSuiteTime = uk.co.darrenhurley.logger.JUnit.getTime();
 };
 
 uk.co.darrenhurley.logger.JUnit.prototype.endTestSuite = function(suite){
 	if(!suite) throw 'No suite supplied';
 	// get current suite
-	var currentSuite = this.suites[this.suites.length - 1];
-	currentSuite.failed = suite.failed;
-	currentSuite.passed = suite.passed;
-	currentSuite.total  = suite.total;
+	if(!this.currentTestSuite) throw 'Call startTestSuite first';
+	this.currentTestSuite.failed = suite.failed;
+	this.currentTestSuite.passed = suite.passed;
+	this.currentTestSuite.time   = (uk.co.darrenhurley.logger.JUnit.getTime() - this.currentTestSuiteTime) / 1000;
+	this.currentTestSuite = undefined;
 };
 
 uk.co.darrenhurley.logger.JUnit.prototype.startTest = function(test){
 	if(!test) throw 'No test supplied';
-	// get current suite
-    this.suites[this.suites.length - 1].tests.push({
+	// store this as current test
+	this.currentTest = {
         name: test.name,
         assertions: []
-    });
+    };
+    this.currentTestSuite.tests.push(this.currentTest);
+	this.currentTestTime = uk.co.darrenhurley.logger.JUnit.getTime();
 };
 
 uk.co.darrenhurley.logger.JUnit.prototype.endTest = function(test){
 	if(!test) throw 'No test supplied';
+	if(!this.currentTest) throw 'Call startTest first';
+	this.currentTest.time = (uk.co.darrenhurley.logger.JUnit.getTime() - this.currentTestTime) / 1000;
+	this.currentTest      = undefined;
 };
 
 uk.co.darrenhurley.logger.JUnit.prototype.addAssertion = function(assertion){
 	if(!assertion) throw 'No assertion supplied';
 	// get current test
-	var currentSuite = this.suites[this.suites.length - 1];
-	currentSuite.tests[currentSuite.tests.length - 1].assertions.push(assertion);
+	if(!this.currentTest) throw 'Call startTest first';
+	this.currentTest.assertions.push(assertion);
 };
 
 uk.co.darrenhurley.logger.JUnit.prototype.write = function(){
     
-    var i, j, k, suite, test, assertion;
+    var i, j, k, suite, test, assertion, testCaseFailed;
     
 	// print header
     this.lineWriter('<?xml version="1.0" encoding="UTF-8"?>');
@@ -55,18 +71,29 @@ uk.co.darrenhurley.logger.JUnit.prototype.write = function(){
     // print each testsuite
     for(i in this.suites){
         suite = this.suites[i];
-        this.lineWriter(new Array(this.tabSize + 1).join(' ') + '<testsuite errors="0" failures="' + suite.failed + '" name="' + suite.name + '" tests="' + suite.total + '">');
+        // write out the opening testsuite element
+        this.lineWriter(new Array(this.tabSize + 1).join(' ') + '<testsuite errors="0" failures="' + suite.failed + '" name="' + suite.name + '" tests="' + suite.tests.length + '" time="' + suite.time + '">');
         // print the tests in the testsuite
         for(j in suite.tests){
             test = suite.tests[j];
-            this.lineWriter(new Array((2 * this.tabSize) + 1).join(' ') + '<testcase name="' + test.name + '">');
+            var testCaseElement = new Array((2 * this.tabSize) + 1).join(' ') + '<testcase name="' + test.name + '" assertions="' + test.assertions.length + '" time="' +  test.time + '"';
+            testCaseFailed = false;
             for(k in test.assertions){
                 assertion = test.assertions[k];
                 if(!assertion.result){
+                    if(!testCaseFailed){
+                        this.lineWriter(testCaseElement + '>');
+                    }
                     this.lineWriter(new Array((3 * this.tabSize) + 1).join(' ') + '<failure message="' + assertion.message + '" type="failed" />');
+                    testCaseFailed = true;
                 }
             }
-            this.lineWriter(new Array((2 * this.tabSize) + 1).join(' ') + '</testcase>');
+            if(!testCaseFailed){
+                this.lineWriter(testCaseElement + ' />');
+            }
+            else{
+                this.lineWriter(new Array((2 * this.tabSize) + 1).join(' ') + '</testcase>');
+            }
         }
         this.lineWriter(new Array(this.tabSize + 1).join(' ') + '</testsuite>')
     }
