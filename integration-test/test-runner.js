@@ -4,7 +4,7 @@ load('../lib/env.rhino.1.2.js');
 load('../dist/junit-logger-min.js');
 
 // write to a file
-var fstream = new java.io.FileWriter(arguments[1] + '/TEST-junit.xml');
+var fstream = new java.io.FileWriter(arguments[1] + '/TEST-qunit.xml');
 var out = new java.io.BufferedWriter(fstream);
 
 var lineWriter = function(line){
