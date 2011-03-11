@@ -58,8 +58,8 @@ uk.co.darrenhurley.logger.JUnit.prototype.write = function(){
         for(j in suite.tests){
             var test = suite.tests[j];
             this.lineWriter(new Array((2 * this.tabSize) + 1).join(' ') + '<testcase name="' + test.name + '">');
-            for(var j in test.assertions){
-                var assertion = test.assertions[i];
+            for(var k in test.assertions){
+                var assertion = test.assertions[k];
                 if(!assertion.result){
                     this.lineWriter(new Array((3 * this.tabSize) + 1).join(' ') + '<failure message="' + assertion.message + '" type="failed" />');
                 }

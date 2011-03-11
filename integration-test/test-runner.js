@@ -18,28 +18,30 @@ Envjs({
     scriptTypes: {
         'text/javascript': true
     },
-    afterScriptLoad:{
+    beforeScriptLoad: {
         'qunit': function(script){
-	    	QUnit.init();
-	    	QUnit.config.blocking = false;
-	    	QUnit.config.autorun = true;
-	    	QUnit.config.updateRate = 0;
-	    	
+            // remove logging HTML from page
+            var tests = document.getElementById('qunit-tests');
+            tests.parentNode.removeChild(tests);
+        }
+    },
+    afterScriptLoad: {
+        'qunit': function(script){
 	    	// override logging
 	    	QUnit.moduleStart = function(module){
-	    	    logger.startTestSuite(module);
+                logger.startTestSuite(module);
 	    	};
 	    	QUnit.moduleDone = function(module){
-	    	    logger.endTestSuite(module);
+                logger.endTestSuite(module);
 	    	};
 	    	QUnit.testStart = function(test){
-	    	    logger.startTest(test);
+                logger.startTest(test);
 	    	};
 	    	QUnit.testDone = function(test){
-	    	    logger.endTest(test);
+                logger.endTest(test);
 	    	};
 	    	QUnit.log = function(assertion){
-	    	    logger.addAssertion(assertion);
+                logger.addAssertion(assertion);
 	    	};
         }
     }

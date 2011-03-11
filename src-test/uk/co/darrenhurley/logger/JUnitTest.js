@@ -1,19 +1,19 @@
 module('JUnit');
 
 test('Should be able to instantiate', function(){
-	var jUnit = new uk.co.darrenhurley.logger.JUnit();
-	ok(jUnit, 'Shouldn\'t be a false value');
+    var jUnit = new uk.co.darrenhurley.logger.JUnit();
+    ok(jUnit, 'Shouldn\'t be a false value');
 });
 
 test('Should have default line writer', function(){
-	var jUnit = new uk.co.darrenhurley.logger.JUnit();
-	strictEqual(print, jUnit.lineWriter, 'Default line writer should be \'print\'');
+    var jUnit = new uk.co.darrenhurley.logger.JUnit();
+    strictEqual(print, jUnit.lineWriter, 'Default line writer should be \'print\'');
 });
 
 test('Should be able to set line writer', function(){
-	var lineWriter = function(){};
-	var jUnit = new uk.co.darrenhurley.logger.JUnit(lineWriter);
-	strictEqual(lineWriter, jUnit.lineWriter, 'Line writer should be supplied value');
+    var lineWriter = function(){};
+    var jUnit = new uk.co.darrenhurley.logger.JUnit(lineWriter);
+    strictEqual(lineWriter, jUnit.lineWriter, 'Line writer should be supplied value');
 });
 
 module('JUnit.startTestSuite');
@@ -28,46 +28,46 @@ var suites = [
 ];
 
 for(var i in suites){
-	test('Should be able to start a test suite [#' + i + ']', function(){
-		var jUnit = new uk.co.darrenhurley.logger.JUnit();
-		var suite = suites[i];
-		jUnit.startTestSuite(suite);
-		var expectedSuite = {
-		    name: suite.name,
-		    tests: []
-		};
-		deepEqual(expectedSuite, jUnit.suites[0], 'Has not started suite correctly');
-	});
+ test('Should be able to start a test suite [#' + i + ']', function(){
+     var jUnit = new uk.co.darrenhurley.logger.JUnit();
+     var suite = suites[i];
+     jUnit.startTestSuite(suite);
+     var expectedSuite = {
+         name: suite.name,
+         tests: []
+     };
+     deepEqual(expectedSuite, jUnit.suites[0], 'Has not started suite correctly');
+ });
 }
 
 test('Should throw error if no suite given', function(){
-	var jUnit = new uk.co.darrenhurley.logger.JUnit();
-	raises(function(){
-		jUnit.startTestSuite();
-	}, 'Should have thrown an error when no suite name was supplied');
+ var jUnit = new uk.co.darrenhurley.logger.JUnit();
+ raises(function(){
+     jUnit.startTestSuite();
+ }, 'Should have thrown an error when no suite name was supplied');
 });
 
 module('JUnit.endTestSuite');
 
 for(var j in suites){
-	test('Should be able to end a test suite [#' + j + ']', function(){
-		var jUnit = new uk.co.darrenhurley.logger.JUnit();
-		var suite = suites[j];
-		jUnit.startTestSuite(suite);
-		jUnit.endTestSuite(suite);
-		var expectedSuite = suite;
-		suite.tests = [];
-		deepEqual(expectedSuite, jUnit.suites[0], 'Has not ended suite correctly');
-	});
+ test('Should be able to end a test suite [#' + j + ']', function(){
+     var jUnit = new uk.co.darrenhurley.logger.JUnit();
+     var suite = suites[j];
+     jUnit.startTestSuite(suite);
+     jUnit.endTestSuite(suite);
+     var expectedSuite = suite;
+     suite.tests = [];
+     deepEqual(expectedSuite, jUnit.suites[0], 'Has not ended suite correctly');
+ });
 }
 
 test('Should throw error if no suite given', function(){
-	var jUnit = new uk.co.darrenhurley.logger.JUnit();
-	// use first suite
-	jUnit.startTestSuite(suites[0]);
-	raises(function(){
-		jUnit.endTestSuite();
-	}, 'Should have thrown an error when no suite name was supplied');
+ var jUnit = new uk.co.darrenhurley.logger.JUnit();
+ // use first suite
+ jUnit.startTestSuite(suites[0]);
+ raises(function(){
+     jUnit.endTestSuite();
+ }, 'Should have thrown an error when no suite name was supplied');
 });
 
 module('JUnit.startTest');
