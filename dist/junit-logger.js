@@ -66,7 +66,7 @@ uk.co.darrenhurley.logger.JUnit.prototype.addAssertion = function(assertion){
 
 uk.co.darrenhurley.logger.JUnit.prototype.write = function(){
     
-    var i, j, k, suite, test, assertion, testCaseFailed;
+    var i, j, k, suite, test, assertion, testCaseFailed, testCaseElement;
     
 	// print header
     this.lineWriter('<?xml version="1.0" encoding="UTF-8"?>');
@@ -76,11 +76,11 @@ uk.co.darrenhurley.logger.JUnit.prototype.write = function(){
     for(i in this.suites){
         suite = this.suites[i];
         // write out the opening testsuite element
-        this.lineWriter(new Array(this.tabSize + 1).join(' ') + '<testsuite errors="0" failures="' + suite.failed + '" name="' + suite.name + '" tests="' + suite.tests.length + '" time="' + suite.time + '">');
+        this.lineWriter(new Array(this.tabSize + 1).join(' ') + '<testsuite name="' + suite.name + '" errors="0" failures="' + suite.failed + '" tests="' + suite.tests.length + '" time="' + suite.time + '">');
         // print the tests in the testsuite
         for(j in suite.tests){
             test = suite.tests[j];
-            var testCaseElement = new Array((2 * this.tabSize) + 1).join(' ') + '<testcase name="' + test.name + '" assertions="' + test.assertions.length + '" time="' +  test.time + '"';
+            testCaseElement = new Array((2 * this.tabSize) + 1).join(' ') + '<testcase name="' + test.name + '" assertions="' + test.assertions.length + '" time="' +  test.time + '"';
             testCaseFailed = false;
             for(k in test.assertions){
                 assertion = test.assertions[k];
