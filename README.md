@@ -8,4 +8,4 @@ To build the JS
 
     $ ant
 
-The integration-test dir contains an example build of how to run QUnit headlessley. Check out it's README.md
+The integration-test dir contains an example build of how to run QUnit headlessley. Check out it's [README.md](./integration-test/README.md)
