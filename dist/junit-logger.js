@@ -50,20 +50,22 @@ uk.co.darrenhurley.logger.JUnit.prototype.addAssertion = function(assertion){
 
 uk.co.darrenhurley.logger.JUnit.prototype.write = function(){
     
+    var i, j, k, suite, test, assertion;
+    
 	// print header
     this.lineWriter('<?xml version="1.0" encoding="UTF-8">');
     this.lineWriter('<testsuites>');
     
     // print each testsuite
-    for(var i in this.suites){
-        var suite         = this.suites[i];
+    for(i in this.suites){
+        suite = this.suites[i];
         this.lineWriter(new Array(this.tabSize + 1).join(' ') + '<testsuite errors="0" failures="' + suite.failed + '" name="' + suite.name + '" tests="' + suite.total + '">');
         // print the tests in the testsuite
         for(j in suite.tests){
-            var test = suite.tests[j];
+            test = suite.tests[j];
             this.lineWriter(new Array((2 * this.tabSize) + 1).join(' ') + '<testcase name="' + test.name + '">');
-            for(var k in test.assertions){
-                var assertion = test.assertions[k];
+            for(k in test.assertions){
+                assertion = test.assertions[k];
                 if(!assertion.result){
                     this.lineWriter(new Array((3 * this.tabSize) + 1).join(' ') + '<failure message="' + assertion.message + '" type="failed" />');
                 }
