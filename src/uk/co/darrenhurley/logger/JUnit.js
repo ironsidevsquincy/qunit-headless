@@ -49,7 +49,7 @@ uk.co.darrenhurley.logger.JUnit.prototype.write = function(){
     var i, j, k, suite, test, assertion;
     
 	// print header
-    this.lineWriter('<?xml version="1.0" encoding="UTF-8">');
+    this.lineWriter('<?xml version="1.0" encoding="UTF-8"?>');
     this.lineWriter('<testsuites>');
     
     // print each testsuite

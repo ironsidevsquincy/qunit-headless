@@ -193,7 +193,7 @@ var outputs = [
          }
      ],
      [
-         '<?xml version="1.0" encoding="UTF-8">',
+         '<?xml version="1.0" encoding="UTF-8"?>',
          '<testsuites>',
          '    <testsuite errors="0" failures="1" name="suiteOne" tests="2">',
          '        <testcase name="testOne">',
